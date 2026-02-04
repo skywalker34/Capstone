@@ -81,7 +81,7 @@ protected:
 	float ChaseSpeed = 1200.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
-	float MaxTurnRate = 1000.f;
+	float MaxAngularSpeed = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	float BounceTurnSpeed = 3.f;

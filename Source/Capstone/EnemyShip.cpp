@@ -3,6 +3,7 @@
 
 #include "EnemyShip.h"
 #include <GameFramework/FloatingPawnMovement.h>
+#include <Kismet/KismetMathLibrary.h>
 
 AEnemyShipPawn::AEnemyShipPawn()
 {
@@ -55,59 +56,76 @@ void AEnemyShipPawn::Tick(float DeltaTime)
 }
 
 
-void AEnemyShipPawn::Chase(float DeltaTime)
-{
-	FVector ToTarget = Target->GetActorLocation() - GetActorLocation();
-	float Distance = ToTarget.Size();
+//void AEnemyShipPawn::Chase(float DeltaTime)
+//{
+	//FVector ToTarget = Target->GetActorLocation() - GetActorLocation();
+	//float Distance = ToTarget.Size();
+	//ToTarget.Normalize();
+
+	//FRotator CurrentRot = GetActorRotation();
+	//FRotator DesiredRot = ToTarget.Rotation();
+
+	//float MaxTurnThisFrame = MaxTurnRate * DeltaTime;
+	//float NewYaw = FMath::FixedTurn(CurrentRot.Yaw, DesiredRot.Yaw, MaxTurnThisFrame);
+	//float NewPitch = FMath::FixedTurn(CurrentRot.Pitch, DesiredRot.Pitch, MaxTurnThisFrame);
+	//SetActorRotation(FRotator(NewPitch, NewYaw, 0.f));
+
+	//float RightDot = FVector::DotProduct(GetActorRightVector(), ToTarget);
+	//float TargetRoll = FMath::Clamp(RightDot * MaxRollAngle, -MaxRollAngle, MaxRollAngle);
+
+	//FRotator MeshRotation = ShipMesh->GetRelativeRotation();
+	//MeshRotation.Roll = FMath::FInterpTo(MeshRotation.Roll, TargetRoll, DeltaTime, RollSpeed);
+	//ShipMesh->SetRelativeRotation(MeshRotation);
+
+	//const float IdealDistance = 3000.f;
+	//const float DistanceTolerance = 1000.f;
+
+	//float DesiredSpeed = PatrolSpeed;
+	//if (Distance < IdealDistance - DistanceTolerance)
+	//	DesiredSpeed = PatrolSpeed;
+	//else if (Distance > IdealDistance + DistanceTolerance)
+	//	DesiredSpeed = ChaseSpeed;
+
+	//CurrentSpeed = FMath::FInterpTo(CurrentSpeed, DesiredSpeed, DeltaTime, 0.1f);
+	//FVector NewLocation = GetActorLocation() + GetActorForwardVector() * CurrentSpeed * DeltaTime;
+	//SetActorLocation(NewLocation, true);
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Current Speed: %f"), CurrentSpeed));
+
+//}
+
+void AEnemyShipPawn::Chase(float DeltaTime) {
+	if (!Target) return;
+
+	FVector MyLocation = GetActorLocation();
+	FVector TargetLocation = Target->GetActorLocation();
+
+	FVector ToTarget = TargetLocation - MyLocation;
+
+	if (ToTarget.IsNearlyZero()) return;
+
 	ToTarget.Normalize();
 
 	FRotator CurrentRot = GetActorRotation();
-	FRotator DesiredRot = ToTarget.Rotation();
+	FRotator TargetRot = ToTarget.Rotation();
 
-	float MaxTurnThisFrame = MaxTurnRate * DeltaTime;
-	float NewYaw = FMath::FixedTurn(CurrentRot.Yaw, DesiredRot.Yaw, MaxTurnThisFrame);
-	float NewPitch = FMath::FixedTurn(CurrentRot.Pitch, DesiredRot.Pitch, MaxTurnThisFrame);
-	SetActorRotation(FRotator(NewPitch, NewYaw, 0.f));
+	FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(TargetRot, CurrentRot);
 
-	float RightDot = FVector::DotProduct(GetActorRightVector(), ToTarget);
-	float TargetRoll = FMath::Clamp(RightDot * MaxRollAngle, -MaxRollAngle, MaxRollAngle);
+	float MaxAngle = MaxAngularSpeed * DeltaTime;
 
-	FRotator MeshRotation = ShipMesh->GetRelativeRotation();
-	MeshRotation.Roll = FMath::FInterpTo(MeshRotation.Roll, TargetRoll, DeltaTime, RollSpeed);
-	ShipMesh->SetRelativeRotation(MeshRotation);
+	DeltaRot.Pitch = FMath::Clamp(DeltaRot.Pitch, -MaxAngle, MaxAngle);
+	DeltaRot.Yaw = FMath::Clamp(DeltaRot.Yaw, -MaxAngle, MaxAngle);
 
-	const float IdealDistance = 3000.f;
-	const float DistanceTolerance = 1000.f;
+	DeltaRot.Roll = 0.f;
 
-	float DesiredSpeed = PatrolSpeed;
-	if (Distance < IdealDistance - DistanceTolerance)
-		DesiredSpeed = PatrolSpeed;
-	else if (Distance > IdealDistance + DistanceTolerance)
-		DesiredSpeed = ChaseSpeed;
+	SetActorRotation(CurrentRot + DeltaRot);
 
-	CurrentSpeed = FMath::FInterpTo(CurrentSpeed, DesiredSpeed, DeltaTime, 0.1f);
-	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * CurrentSpeed * DeltaTime;
-	SetActorLocation(NewLocation, true);
+	FVector NewLocation =
+		MyLocation + GetActorForwardVector() * ChaseSpeed * DeltaTime;
 
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Current Speed: %f"), CurrentSpeed));
-
+	SetActorLocation(NewLocation);
 }
-
-//void AEnemyShipPawn::Chase(float DeltaTime) { 
-//	FVector ToTarget = Target->GetActorLocation() - GetActorLocation(); 
-//	ToTarget.Normalize(); FRotator TargetRotation = ToTarget.Rotation();
-//	SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, TurnSpeed));
-//	float RightDot = FVector::DotProduct(GetActorRightVector(), ToTarget);
-//	float TargetRoll = RightDot * MaxRollAngle;
-//	FRotator MeshRotation = ShipMesh->GetRelativeRotation();
-//	MeshRotation.Roll = FMath::FInterpTo(MeshRotation.Roll, TargetRoll, DeltaTime, RollSpeed);
-//	ShipMesh->SetRelativeRotation(MeshRotation);
-//	CurrentSpeed = (Target->GetActorLocation() - GetActorLocation()).Size() < 1000 ? (CurrentSpeed - 100) : ChaseSpeed;
-//	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Current Speed: %f"), CurrentSpeed));
-//	FVector NewLocation = GetActorLocation() + GetActorForwardVector() * CurrentSpeed * DeltaTime; 
-//  SetActorLocation(NewLocation, true);
-//}
 
 void AEnemyShipPawn::Patrol(float DeltaTime)
 {
