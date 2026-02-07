@@ -103,6 +103,7 @@ void AEnemyShipPawn::Chase(float DeltaTime) {
 
 	FVector ToTarget = TargetLocation - MyLocation;
 
+	float DistanceToTarget = ToTarget.Length();
 	if (ToTarget.IsNearlyZero()) return;
 
 	ToTarget.Normalize();
@@ -116,14 +117,17 @@ void AEnemyShipPawn::Chase(float DeltaTime) {
 
 	DeltaRot.Pitch = FMath::Clamp(DeltaRot.Pitch, -MaxAngle, MaxAngle);
 	DeltaRot.Yaw = FMath::Clamp(DeltaRot.Yaw, -MaxAngle, MaxAngle);
-
 	DeltaRot.Roll = 0.f;
-
 	SetActorRotation(CurrentRot + DeltaRot);
 
-	FVector NewLocation =
-		MyLocation + GetActorForwardVector() * ChaseSpeed * DeltaTime;
+	float SpeedScale = 1.f;
 
+	if (DistanceToTarget < DesiredDistance + SlowDownRange)
+	{
+		SpeedScale = FMath::Clamp((DistanceToTarget - DesiredDistance) / SlowDownRange, 0.f, 1.f);
+	}
+
+	FVector NewLocation = MyLocation + GetActorForwardVector() * ChaseSpeed * SpeedScale * DeltaTime;
 	SetActorLocation(NewLocation);
 }
 

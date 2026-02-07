@@ -87,6 +87,12 @@ protected:
 	float BounceTurnSpeed = 3.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float DesiredDistance = 3000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float SlowDownRange = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	TSubclassOf<AActor> ProjectileClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EnemyAI")

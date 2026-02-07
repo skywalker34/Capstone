@@ -42,7 +42,6 @@ ASpaceshipPawn::ASpaceshipPawn()
 void ASpaceshipPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, FString::Printf(TEXT("Speed Begin: %.1f"), CurrentSpeed));
 	SpringArm->bUsePawnControlRotation = false;
 	Camera->bUsePawnControlRotation = false;
 }
@@ -62,7 +61,6 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 
 	FVector MoveDir = ForwardDir + RightDir * YawInput;
 	MoveDir = MoveDir.GetClampedToMaxSize(1.0f);
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, FString::Printf(TEXT("Speed: %.1f"), CurrentSpeed));
 	MovementComp->MaxSpeed = CurrentSpeed;
 
 	if (FMath::Abs(RollInput) < 0.01f && FMath::Abs(FlipInput) < 0.01f)
@@ -80,7 +78,6 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 
 	if (bIsHoldingSwitchCamera)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, FString::Printf(TEXT("Switch")));
 		SwitchCamera();
 	}
 	else {

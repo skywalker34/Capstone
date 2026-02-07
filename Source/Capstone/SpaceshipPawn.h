@@ -21,7 +21,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ShipMesh;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	class UFloatingPawnMovement* MovementComp;
 
 	UPROPERTY(VisibleAnywhere)
