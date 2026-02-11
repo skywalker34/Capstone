@@ -39,14 +39,14 @@ protected:
 
 
 	// --- Input functions ---
-	void Accelerate();
-	void Decelerate();
+	void Fire();
 	void SwitchCamera();
 	void Pitch(float Value);
 	void Yaw(float Value);
 	void Roll(float Value);
 	void Flip(float Value);
-	void Fire();
+	void Accelerate(float Value);
+
 
 	void OnSwitchCameraPressed();
 	void OnSwitchCameraReleased();

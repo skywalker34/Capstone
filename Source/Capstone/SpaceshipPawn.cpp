@@ -71,7 +71,7 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 		float NewRoll = FMath::FInterpTo(CurrentRot.Roll, TargetRoll, DeltaTime, RollSpeed * 0.5f);
 
 		float TargetPitch = PitchInput * MaxPitchTilt;
-		float NewPitch = FMath::FInterpTo(CurrentRot.Pitch, TargetPitch, DeltaTime, PitchSpeed * 0.05f);
+		float NewPitch = FMath::FInterpTo(CurrentRot.Pitch, TargetPitch, DeltaTime, PitchSpeed * 0.5f);
 
 		ShipMesh->SetRelativeRotation(FRotator(NewPitch, CurrentRot.Yaw, NewRoll));
 	}
@@ -90,8 +90,6 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 
 void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	PlayerInputComponent->BindAction("Accelerate", IE_Pressed, this, &ASpaceshipPawn::Accelerate);
-	PlayerInputComponent->BindAction("Decelerate", IE_Pressed, this, &ASpaceshipPawn::Decelerate);
 	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ASpaceshipPawn::OnSwitchCameraPressed);
 	PlayerInputComponent->BindAction("SwitchCamera", IE_Released, this, &ASpaceshipPawn::OnSwitchCameraReleased);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASpaceshipPawn::Fire);
@@ -99,19 +97,17 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("Yaw", this, &ASpaceshipPawn::Yaw);
 	PlayerInputComponent->BindAxis("Roll", this, &ASpaceshipPawn::Roll);
 	PlayerInputComponent->BindAxis("Flip", this, &ASpaceshipPawn::Flip);
+	PlayerInputComponent->BindAxis("Accelerate", this, &ASpaceshipPawn::Accelerate);
+
 }
 
-void ASpaceshipPawn::Accelerate()
+void ASpaceshipPawn::Accelerate(float Value)
 {
-	CurrentSpeed += Acceleration * GetWorld()->GetDeltaSeconds();
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Acceleration: %f"), Value));
+	CurrentSpeed += Acceleration * Value * GetWorld()->GetDeltaSeconds();
 	CurrentSpeed = CurrentSpeed > MaxSpeed ? MaxSpeed : CurrentSpeed;
 }
 
-void ASpaceshipPawn::Decelerate()
-{
-	CurrentSpeed -= Acceleration * GetWorld()->GetDeltaSeconds();
-	CurrentSpeed = CurrentSpeed < MinSpeed ? MinSpeed : CurrentSpeed;
-}
 
 void ASpaceshipPawn::SwitchCamera()
 {
@@ -163,6 +159,7 @@ void ASpaceshipPawn::Flip(float Value)
 		float NewRoll = FMath::FInterpTo(CurrentRotation.Roll, FlipInput * 180, GetWorld()->GetDeltaSeconds(), RollSpeed);
 		ShipMesh->SetRelativeRotation(FRotator(CurrentRotation.Pitch, CurrentRotation.Yaw, NewRoll));
 	}
+
 }
 
 void ASpaceshipPawn::Fire()
