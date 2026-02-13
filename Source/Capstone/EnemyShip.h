@@ -63,7 +63,7 @@ protected:
 	float TurnSpeed = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
-	EEnemyState CurrentState;
+	EEnemyState CurrentState = EEnemyState::Patrol;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	TArray<AActor*> Waypoints;

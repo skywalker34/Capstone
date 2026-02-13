@@ -71,7 +71,7 @@ void ATurret::AimAtTarget(float DeltaTime)
 	FVector Forward = Muzzle->GetForwardVector();
 	//FVector EndLocation = MuzzleLocation + Forward * (PredictedLocation - MuzzleLocation).Size();
 
-	DrawDebugLine(GetWorld(), MuzzleLocation, PredictedLocation, FColor::Red, false, 0.f, 0, 2.f);
+	//DrawDebugLine(GetWorld(), MuzzleLocation, PredictedLocation, FColor::Red, false, 0.f, 0, 2.f);
 
 	FireTimer += DeltaTime;
 	if (FireTimer >= FireInterval)

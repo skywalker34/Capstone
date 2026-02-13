@@ -103,7 +103,6 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ASpaceshipPawn::Accelerate(float Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Acceleration: %f"), Value));
 	CurrentSpeed += Acceleration * Value * GetWorld()->GetDeltaSeconds();
 	CurrentSpeed = CurrentSpeed > MaxSpeed ? MaxSpeed : CurrentSpeed;
 }

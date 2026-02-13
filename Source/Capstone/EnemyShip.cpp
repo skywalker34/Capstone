@@ -47,53 +47,11 @@ void AEnemyShipPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (!Target) return;
 
-	Chase(DeltaTime);
-
 	NextState();
 
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Current State: %s"), *StateName));
 	Action(DeltaTime);
 }
 
-
-//void AEnemyShipPawn::Chase(float DeltaTime)
-//{
-	//FVector ToTarget = Target->GetActorLocation() - GetActorLocation();
-	//float Distance = ToTarget.Size();
-	//ToTarget.Normalize();
-
-	//FRotator CurrentRot = GetActorRotation();
-	//FRotator DesiredRot = ToTarget.Rotation();
-
-	//float MaxTurnThisFrame = MaxTurnRate * DeltaTime;
-	//float NewYaw = FMath::FixedTurn(CurrentRot.Yaw, DesiredRot.Yaw, MaxTurnThisFrame);
-	//float NewPitch = FMath::FixedTurn(CurrentRot.Pitch, DesiredRot.Pitch, MaxTurnThisFrame);
-	//SetActorRotation(FRotator(NewPitch, NewYaw, 0.f));
-
-	//float RightDot = FVector::DotProduct(GetActorRightVector(), ToTarget);
-	//float TargetRoll = FMath::Clamp(RightDot * MaxRollAngle, -MaxRollAngle, MaxRollAngle);
-
-	//FRotator MeshRotation = ShipMesh->GetRelativeRotation();
-	//MeshRotation.Roll = FMath::FInterpTo(MeshRotation.Roll, TargetRoll, DeltaTime, RollSpeed);
-	//ShipMesh->SetRelativeRotation(MeshRotation);
-
-	//const float IdealDistance = 3000.f;
-	//const float DistanceTolerance = 1000.f;
-
-	//float DesiredSpeed = PatrolSpeed;
-	//if (Distance < IdealDistance - DistanceTolerance)
-	//	DesiredSpeed = PatrolSpeed;
-	//else if (Distance > IdealDistance + DistanceTolerance)
-	//	DesiredSpeed = ChaseSpeed;
-
-	//CurrentSpeed = FMath::FInterpTo(CurrentSpeed, DesiredSpeed, DeltaTime, 0.1f);
-	//FVector NewLocation = GetActorLocation() + GetActorForwardVector() * CurrentSpeed * DeltaTime;
-	//SetActorLocation(NewLocation, true);
-
-
-	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Current Speed: %f"), CurrentSpeed));
-
-//}
 
 void AEnemyShipPawn::Chase(float DeltaTime) {
 	if (!Target) return;
@@ -178,7 +136,6 @@ void AEnemyShipPawn::Attack(float DeltaTime)
 
 	FireTimer += DeltaTime;
 	if (FireTimer >= FireInterval) {
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("FIRE")));
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
 		FireTimer = 0.0f;
 	}
@@ -200,6 +157,7 @@ void AEnemyShipPawn::Action(float DeltaTime)
 
 	case EEnemyState::Attack:
 		StateName = "Attack";
+		Chase(DeltaTime);
 		Attack(DeltaTime);
 		break;
 	}
