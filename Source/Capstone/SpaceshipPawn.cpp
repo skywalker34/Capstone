@@ -36,6 +36,8 @@ ASpaceshipPawn::ASpaceshipPawn()
 	InitialSpringArmLocation = SpringArm->GetRelativeLocation();
 	InitialSpringArmRotation = SpringArm->GetRelativeRotation();
 
+	ShipMesh->OnComponentHit.AddDynamic(this, &ASpaceshipPawn::OnSpaceshipHit);
+
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
@@ -62,6 +64,7 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 	FVector MoveDir = ForwardDir + RightDir * YawInput;
 	MoveDir = MoveDir.GetClampedToMaxSize(1.0f);
 	MovementComp->MaxSpeed = CurrentSpeed;
+	//CurrentVelocity = GetActorForwardVector() * CurrentSpeed;
 
 	if (FMath::Abs(RollInput) < 0.01f && FMath::Abs(FlipInput) < 0.01f)
 	{
@@ -76,7 +79,7 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 		ShipMesh->SetRelativeRotation(FRotator(NewPitch, CurrentRot.Yaw, NewRoll));
 	}
 
-	if (bIsHoldingSwitchCamera)
+	if (IsHoldingSwitchCamera)
 	{
 		SwitchCamera();
 	}
@@ -86,6 +89,8 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 	}
 
 	AddMovementInput(GetActorForwardVector(), 1.0f);
+	//AddMovementInput(CurrentVelocity.GetSafeNormal(), 1.0f);
+
 }
 
 void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -99,6 +104,25 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("Flip", this, &ASpaceshipPawn::Flip);
 	PlayerInputComponent->BindAxis("Accelerate", this, &ASpaceshipPawn::Accelerate);
 
+}
+
+void ASpaceshipPawn::OnSpaceshipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!MovementComp) return;
+
+	CurrentVelocity = MovementComp->Velocity;
+
+	float Dot = FVector::DotProduct(CurrentVelocity, Hit.Normal);
+
+	if (Dot < 0.f)
+	{
+		FVector ReflectedVelocity = CurrentVelocity.MirrorByVector(Hit.Normal);
+
+		ReflectedVelocity *= ReflectionConstant;
+		ReflectedVelocity += Hit.Normal * ReflectionOffset;
+
+		MovementComp->Velocity = ReflectedVelocity;
+	}
 }
 
 void ASpaceshipPawn::Accelerate(float Value)
@@ -120,12 +144,12 @@ void ASpaceshipPawn::SwitchCamera()
 
 void ASpaceshipPawn::OnSwitchCameraPressed()
 {
-	bIsHoldingSwitchCamera = true;
+	IsHoldingSwitchCamera = true;
 }
 
 void ASpaceshipPawn::OnSwitchCameraReleased()
 {
-	bIsHoldingSwitchCamera = false;
+	IsHoldingSwitchCamera = false;
 }
 
 void ASpaceshipPawn::Pitch(float Value)

@@ -85,6 +85,12 @@ protected:
 	float RollSpeed = 3.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	float ReflectionConstant = 0.8f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	float ReflectionOffset = 300.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	TSubclassOf<AActor> ProjectileClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Flight")
@@ -99,9 +105,11 @@ protected:
 	float CurrentYawAngle = 0.0f;
 	float CurrentRollAngle = 0.0f;
 
-	bool bIsHoldingSwitchCamera = false;
+	bool IsHoldingSwitchCamera = false;
 
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION()
+	void OnSpaceshipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

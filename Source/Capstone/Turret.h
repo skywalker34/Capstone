@@ -40,6 +40,9 @@ protected:
 	float AimSpeed = 5000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
+	float TargetOffset = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
 	AActor* Target;
 
 	void AimAtTarget(float DeltaTime);

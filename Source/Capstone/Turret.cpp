@@ -44,7 +44,9 @@ void ATurret::Tick(float DeltaTime)
 
 	FVector ToTarget = Target->GetActorLocation() - GetActorLocation();
 
-	if (ToTarget.Size() > Range || ToTarget.Z < 0) return;
+	float MinRange = (BaseMesh->GetComponentLocation() - Muzzle->GetComponentLocation()).Size() * 2;
+
+	if (ToTarget.Size() > Range || ToTarget.Size() < MinRange || ToTarget.Z < 0) return;
 
 	//if (ToTarget.Size() > Range) return;
 
@@ -62,14 +64,15 @@ void ATurret::AimAtTarget(float DeltaTime)
 	FVector S = TargetLocation - MuzzleLocation;
 	float time = S.Size() / relativeVelocity.Size();
 
-	FVector PredictedLocation = TargetLocation + TargetVelocity * time;
+	FVector PredictionOffset = TargetVelocity.GetSafeNormal() * TargetOffset * FMath::RandRange(0, 3);
+
+	FVector PredictedLocation = TargetLocation + PredictionOffset + TargetVelocity * time;
 	FRotator DesiredRotation = (PredictedLocation - MuzzleLocation).Rotation();
 
 	FRotator NewRotation = FMath::RInterpTo(BaseMesh->GetComponentRotation(), DesiredRotation, DeltaTime, AimSpeed);
 	BaseMesh->SetWorldRotation(NewRotation);
 
 	FVector Forward = Muzzle->GetForwardVector();
-	//FVector EndLocation = MuzzleLocation + Forward * (PredictedLocation - MuzzleLocation).Size();
 
 	//DrawDebugLine(GetWorld(), MuzzleLocation, PredictedLocation, FColor::Red, false, 0.f, 0, 2.f);
 
