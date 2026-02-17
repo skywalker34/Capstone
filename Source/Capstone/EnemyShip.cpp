@@ -86,7 +86,7 @@ void AEnemyShipPawn::Chase(float DeltaTime) {
 	}
 
 	FVector NewLocation = MyLocation + GetActorForwardVector() * ChaseSpeed * SpeedScale * DeltaTime;
-	SetActorLocation(NewLocation);
+	SetActorLocation(NewLocation, true);
 }
 
 void AEnemyShipPawn::Patrol(float DeltaTime)
@@ -130,7 +130,12 @@ void AEnemyShipPawn::Attack(float DeltaTime)
 	if (!ProjectileClass || !Muzzle) return;
 
 	FVector SpawnLocation = Muzzle->GetComponentLocation();
-	FRotator SpawnRotation = Muzzle->GetComponentRotation();
+	//FRotator SpawnRotation = Muzzle->GetComponentRotation();
+	FVector Forward = Muzzle->GetForwardVector();
+	float ShootingConeAngleRad = FMath::DegreesToRadians(ShootingConeAngle);
+	FVector RandomDir = FMath::VRandCone(Forward, ShootingConeAngleRad);
+	FRotator SpawnRotation = RandomDir.Rotation();
+
 	FActorSpawnParameters Params;
 	Params.Owner = this;
 

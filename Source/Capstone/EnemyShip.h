@@ -40,7 +40,6 @@ protected:
 	FString StateName;
 	int CurrentWaypointIndex = 0;
 	float CurrentSpeed = 3000;
-	float FireInterval = 0.5f;
 	float FireTimer = 0.0f;
 
 	// --- Movement Settings (copy from your player pawn) ---
@@ -91,6 +90,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	float SlowDownRange = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float FireInterval = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float ShootingConeAngle = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	TSubclassOf<AActor> ProjectileClass;
