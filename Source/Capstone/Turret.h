@@ -43,6 +43,9 @@ protected:
 	float TargetOffset = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
+	float ShootingConeAngle = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
 	AActor* Target;
 
 	void AimAtTarget(float DeltaTime);

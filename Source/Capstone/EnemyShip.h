@@ -41,6 +41,8 @@ protected:
 	int CurrentWaypointIndex = 0;
 	float CurrentSpeed = 3000;
 	float FireTimer = 0.0f;
+	bool IsAvoidingWall = false;
+	FVector AvoidTargetLocation;
 
 	// --- Movement Settings (copy from your player pawn) ---
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
@@ -96,6 +98,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	float ShootingConeAngle = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float TraceDistance = 8000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float AvoidDistance = 10000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
+	float AvoidArriveDistance = 2000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	TSubclassOf<AActor> ProjectileClass;

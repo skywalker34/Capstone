@@ -89,7 +89,11 @@ void ATurret::Fire()
 	if (!ProjectileClass || !Muzzle) return;
 
 	FVector SpawnLocation = Muzzle->GetComponentLocation();
-	FRotator SpawnRotation = Muzzle->GetComponentRotation();
+	//FRotator SpawnRotation = Muzzle->GetComponentRotation();
+	FVector Forward = Muzzle->GetForwardVector();
+	float ShootingConeAngleRad = FMath::DegreesToRadians(ShootingConeAngle);
+	FVector RandomDir = FMath::VRandCone(Forward, ShootingConeAngleRad);
+	FRotator SpawnRotation = RandomDir.Rotation();
 
 	FActorSpawnParameters Params;
 	Params.Owner = this;

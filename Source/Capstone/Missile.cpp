@@ -33,7 +33,7 @@ void AMissile::Tick(float DeltaTime)
 
 	float TargetDistance = (Target->GetActorLocation() - GetActorLocation()).Length();
 	if (!IsActivate) {
-		IsActivate = TargetDistance < ActivateRange;
+		IsActivate = TargetDistance < ActivateRange && Target->GetActorLocation().Z > GetActorLocation().Z;
 	}
 	else {
 		UpdateSteering(DeltaTime);
