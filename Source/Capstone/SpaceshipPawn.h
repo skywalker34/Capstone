@@ -24,10 +24,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	class UFloatingPawnMovement* MovementComp;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	class USpringArmComponent* SpringArm;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	class UCameraComponent* Camera;
 
 	// --- Movement parameters ---
@@ -89,6 +89,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	float ReflectionOffset = 300.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	float CameraDistance = 3000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	float SpringArmOffset = 500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	TSubclassOf<AActor> ProjectileClass;

@@ -12,6 +12,8 @@ ASpaceshipPawn::ASpaceshipPawn()
 	CurrentSpeed = MinSpeed;
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
 	ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMesh;
 	ShipMesh->SetEnableGravity(false);
@@ -25,7 +27,7 @@ ASpaceshipPawn::ASpaceshipPawn()
 	MovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComp"));
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(ShipMesh);
-	SpringArm->TargetArmLength = 300.0f;
+	SpringArm->TargetArmLength = CameraDistance;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
@@ -135,9 +137,9 @@ void ASpaceshipPawn::Accelerate(float Value)
 void ASpaceshipPawn::SwitchCamera()
 {
 	FVector Forward = GetActorForwardVector();
-	FVector NewCameraLocation = GetActorLocation() + Forward * 300.f + FVector(0.f, 0.f, 100.f);
+	FVector NewCameraLocation = GetActorLocation() + Forward * CameraDistance + FVector(0.f, 0.f, SpringArmOffset);
 
-	SpringArm->TargetArmLength = 300.f;
+	SpringArm->TargetArmLength = CameraDistance;
 	FRotator LookRotation = (-Forward).Rotation();
 	SpringArm->SetWorldRotation(LookRotation);
 }
@@ -155,6 +157,7 @@ void ASpaceshipPawn::OnSwitchCameraReleased()
 void ASpaceshipPawn::Pitch(float Value)
 {
 	PitchInput = Value;
+	PitchSpeed = RollInput != 0.f ? 30 : 5;
 	AddActorLocalRotation(FRotator(Value * PitchSpeed * GetWorld()->GetDeltaSeconds(), 0.f, 0.f));
 }
 
@@ -200,8 +203,9 @@ void ASpaceshipPawn::Fire()
 		return;
 	}
 
+
 	FVector TraceStart = CameraLocation;
-	FVector TraceEnd = TraceStart + CameraRotation.Vector() * 10000.f;
+	FVector TraceEnd = TraceStart + CameraRotation.Vector() * 1000000.f;
 	FHitResult HitResult;
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(this);
