@@ -46,12 +46,14 @@ protected:
 	float ShootingConeAngle = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
+	float FireInterval = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
 	AActor* Target;
 
 	void AimAtTarget(float DeltaTime);
 	void Fire();
 
-	float FireInterval = 0.2f;
 	float FireTimer = 0.0f;
 
 public:

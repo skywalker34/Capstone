@@ -51,7 +51,13 @@ protected:
 	float ChasingHeightOffset = 2000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Missile")
+	float ChasingHForwardOffset = -2000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Missile")
 	float AttackDistance = 2000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Missile")
+	float SlowDownRadius = 2000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Missile")
 	EMissileState MissileState = EMissileState::Chase;

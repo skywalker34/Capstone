@@ -46,10 +46,19 @@ void AMissile::UpdateSteering(float DeltaTime)
 
 	FVector MyLocation = GetActorLocation();
 	FVector ToTarget = TargetLocation - MyLocation;
+	FVector TargetVelocity = Target->GetVelocity();
+	ToTarget += TargetVelocity * DeltaTime;
 
 	if (ToTarget.IsNearlyZero()) return;
 
-	FVector DesiredVelocity = ToTarget.GetSafeNormal() * MaxSpeed;
+	float SpeedScale = 1.f;
+
+	if (Distance < SlowDownRadius)
+	{
+		SpeedScale = Distance / SlowDownRadius;
+	}
+
+	FVector DesiredVelocity = ToTarget.GetSafeNormal() * MaxSpeed * SpeedScale;
 	FVector Steering = DesiredVelocity - CurrentVelocity;
 	FVector AvoidForce = CalculateAvoidForce();
 	FVector TotalSteering = Steering + AvoidForce;
@@ -102,7 +111,7 @@ FVector AMissile::CalculateAvoidForce()
 void AMissile::Action()
 {
 	FVector PlayerLocation = Target->GetActorLocation();
-	TargetLocation = PlayerLocation + FVector(0, 0, ChasingHeightOffset);
+	TargetLocation = PlayerLocation + FVector(ChasingHForwardOffset, 0, ChasingHeightOffset);
 	Distance = (PlayerLocation - GetActorLocation()).Length();
 	switch (MissileState)
 	{
@@ -111,7 +120,7 @@ void AMissile::Action()
 		float DescendingDistance = AttackDistance * 2;
 		if (Distance < DescendingDistance && Distance > AttackDistance) {
 			float OffsetScale = (Distance - AttackDistance) / AttackDistance;
-			TargetLocation = PlayerLocation + FVector(0, 0, ChasingHeightOffset * OffsetScale);
+			TargetLocation = PlayerLocation + FVector(ChasingHForwardOffset * OffsetScale, 0, ChasingHeightOffset * OffsetScale);
 		}
 		if (Distance < AttackDistance)
 		{
