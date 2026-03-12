@@ -51,10 +51,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
 	AActor* Target;
 
-	void AimAtTarget(float DeltaTime);
+	float FireTimer = 0.0f;
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void Fire();
 
-	float FireTimer = 0.0f;
+	void AimAtTarget(float DeltaTime);
 
 public:
 	// Called every frame

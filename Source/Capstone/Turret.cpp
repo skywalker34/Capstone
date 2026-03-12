@@ -64,9 +64,8 @@ void ATurret::AimAtTarget(float DeltaTime)
 	FVector S = TargetLocation - MuzzleLocation;
 	float time = S.Size() / relativeVelocity.Size();
 
-	FVector PredictionOffset = TargetVelocity.GetSafeNormal() * TargetOffset * FMath::RandRange(0, 3);
+	FVector PredictedLocation = TargetVelocity.IsNearlyZero() ? TargetLocation : TargetLocation + TargetVelocity * time;
 
-	FVector PredictedLocation = TargetLocation + PredictionOffset + TargetVelocity * time;
 	FRotator DesiredRotation = (PredictedLocation - MuzzleLocation).Rotation();
 
 	FRotator NewRotation = FMath::RInterpTo(BaseMesh->GetComponentRotation(), DesiredRotation, DeltaTime, AimSpeed);
@@ -82,22 +81,5 @@ void ATurret::AimAtTarget(float DeltaTime)
 		Fire();
 		FireTimer = 0.0f;
 	}
-}
-
-void ATurret::Fire()
-{
-	if (!ProjectileClass || !Muzzle) return;
-
-	FVector SpawnLocation = Muzzle->GetComponentLocation();
-	//FRotator SpawnRotation = Muzzle->GetComponentRotation();
-	FVector Forward = Muzzle->GetForwardVector();
-	float ShootingConeAngleRad = FMath::DegreesToRadians(ShootingConeAngle);
-	FVector RandomDir = FMath::VRandCone(Forward, ShootingConeAngleRad);
-	FRotator SpawnRotation = RandomDir.Rotation();
-
-	FActorSpawnParameters Params;
-	Params.Owner = this;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
 }
 
