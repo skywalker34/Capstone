@@ -114,6 +114,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	USceneComponent* Muzzle;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnProjectile(FVector SpawnLocation, FRotator SpawnRotation);
+
 	void Chase(float DeltaTime);
 	void Patrol(float DeltaTime);
 	void Attack(float DeltaTime);

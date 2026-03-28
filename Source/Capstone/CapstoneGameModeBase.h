@@ -19,6 +19,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-	TSubclassOf<class APawn> EnemyShipClass;
+	void SpawnEnemy();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	TSubclassOf<APawn> PlayerOneClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	TSubclassOf<APawn> PlayerTwoClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	TSubclassOf<class AEnemyShipPawn> EnemyShipClass;
 };

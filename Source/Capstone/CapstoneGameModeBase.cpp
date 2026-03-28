@@ -1,30 +1,26 @@
 #include "CapstoneGameModeBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerStart.h"
 #include "EnemyShip.h"
 #include <Kismet/GameplayStatics.h>
 
 
 ACapstoneGameModeBase::ACapstoneGameModeBase()
 {
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/BP_SpaceshipPawn"));
 
-	if (PlayerPawnBPClass.Class != nullptr)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<APawn> EnemyPawnBPClass(TEXT("/Game/Blueprints/BP_EnemyShipPawn"));
-	if (EnemyPawnBPClass.Class != nullptr)
-	{
-		EnemyShipClass = EnemyPawnBPClass.Class;
-	}
+	DefaultPawnClass = nullptr;
 }
 
 void ACapstoneGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//SpawnEnemy();
+}
+
+void ACapstoneGameModeBase::SpawnEnemy()
+{
 	TArray<AActor*> Waypoints;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), Waypoints);
 

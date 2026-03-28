@@ -27,10 +27,17 @@ void ATurret::BeginPlay()
 
 	if (!Target)
 	{
-		APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		if (PlayerPawn)
+		//APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		//if (PlayerPawn)
+		//{
+		//	Target = PlayerPawn;
+		//}
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), SpaceshipClass, FoundActors);
+
+		if (FoundActors.Num() > 0)
 		{
-			Target = PlayerPawn;
+			Target = Cast<APawn>(FoundActors[0]);
 		}
 	}
 }
@@ -48,7 +55,6 @@ void ATurret::Tick(float DeltaTime)
 
 	if (ToTarget.Size() > Range || ToTarget.Size() < MinRange || ToTarget.Z < 0) return;
 
-	//if (ToTarget.Size() > Range) return;
 
 	AimAtTarget(DeltaTime);
 }
@@ -73,7 +79,6 @@ void ATurret::AimAtTarget(float DeltaTime)
 
 	FVector Forward = Muzzle->GetForwardVector();
 
-	//DrawDebugLine(GetWorld(), MuzzleLocation, PredictedLocation, FColor::Red, false, 0.f, 0, 2.f);
 
 	FireTimer += DeltaTime;
 	if (FireTimer >= FireInterval)

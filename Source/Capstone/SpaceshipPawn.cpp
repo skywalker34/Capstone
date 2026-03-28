@@ -38,9 +38,7 @@ ASpaceshipPawn::ASpaceshipPawn()
 	InitialSpringArmLocation = SpringArm->GetRelativeLocation();
 	InitialSpringArmRotation = SpringArm->GetRelativeRotation();
 
-	ShipMesh->OnComponentHit.AddDynamic(this, &ASpaceshipPawn::OnSpaceshipHit);
-
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
+	AutoPossessPlayer = EAutoReceiveInput::Disabled;
 }
 
 void ASpaceshipPawn::BeginPlay()
@@ -66,7 +64,6 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 	FVector MoveDir = ForwardDir + RightDir * YawInput;
 	MoveDir = MoveDir.GetClampedToMaxSize(1.0f);
 	MovementComp->MaxSpeed = CurrentSpeed;
-	//CurrentVelocity = GetActorForwardVector() * CurrentSpeed;
 
 	if (FMath::Abs(RollInput) < 0.01f && FMath::Abs(FlipInput) < 0.01f)
 	{
@@ -90,8 +87,17 @@ void ASpaceshipPawn::Tick(float DeltaTime)
 		SpringArm->SetRelativeRotation(InitialSpringArmRotation);
 	}
 
+	if (IsRecharging) {
+		RechargeTimer += DeltaTime;
+
+		if (RechargeTimer >= TotalRechargeTime) {
+			IsRecharging = false;
+			RechargeTimer = 0;
+			CurrentShootingCount = 0;
+		}
+	}
+
 	AddMovementInput(GetActorForwardVector(), 1.0f);
-	//AddMovementInput(CurrentVelocity.GetSafeNormal(), 1.0f);
 
 }
 
@@ -99,32 +105,13 @@ void ASpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ASpaceshipPawn::OnSwitchCameraPressed);
 	PlayerInputComponent->BindAction("SwitchCamera", IE_Released, this, &ASpaceshipPawn::OnSwitchCameraReleased);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASpaceshipPawn::Fire);
+	PlayerInputComponent->BindAxis("Fire", this, &ASpaceshipPawn::Fire);
 	PlayerInputComponent->BindAxis("Pitch", this, &ASpaceshipPawn::Pitch);
 	PlayerInputComponent->BindAxis("Yaw", this, &ASpaceshipPawn::Yaw);
 	PlayerInputComponent->BindAxis("Roll", this, &ASpaceshipPawn::Roll);
 	PlayerInputComponent->BindAxis("Flip", this, &ASpaceshipPawn::Flip);
 	PlayerInputComponent->BindAxis("Accelerate", this, &ASpaceshipPawn::Accelerate);
 
-}
-
-void ASpaceshipPawn::OnSpaceshipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (!MovementComp) return;
-
-	CurrentVelocity = MovementComp->Velocity;
-
-	float Dot = FVector::DotProduct(CurrentVelocity, Hit.Normal);
-
-	if (Dot < 0.f)
-	{
-		FVector ReflectedVelocity = CurrentVelocity.MirrorByVector(Hit.Normal);
-
-		ReflectedVelocity *= ReflectionConstant;
-		ReflectedVelocity += Hit.Normal * ReflectionOffset;
-
-		MovementComp->Velocity = ReflectedVelocity;
-	}
 }
 
 void ASpaceshipPawn::Accelerate(float Value)
@@ -188,8 +175,17 @@ void ASpaceshipPawn::Flip(float Value)
 
 }
 
-void ASpaceshipPawn::Fire()
+void ASpaceshipPawn::Fire(float Value)
 {
+	if (IsRecharging) return;
+
+	FireInput = Value;
+	if (Value == 0.f) return;
+
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (CurrentTime - LastFireTime < FireInterval) return;
+	LastFireTime = CurrentTime;
+
 	if (!ProjectileClass || !Muzzle) return;
 
 	FVector CameraLocation;
@@ -219,5 +215,12 @@ void ASpaceshipPawn::Fire()
 
 	FActorSpawnParameters Params;
 	Params.Owner = this;
+
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
+
+	CurrentShootingCount++;
+
+	if (CurrentShootingCount == MaxShootingCount) {
+		IsRecharging = true;
+	}
 }

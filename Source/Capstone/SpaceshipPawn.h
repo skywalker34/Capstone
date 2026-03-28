@@ -39,17 +39,19 @@ protected:
 
 
 	// --- Input functions ---
-	void Fire();
 	void SwitchCamera();
 	void Pitch(float Value);
 	void Yaw(float Value);
 	void Roll(float Value);
 	void Flip(float Value);
 	void Accelerate(float Value);
-
+	void Fire(float Value);
 
 	void OnSwitchCameraPressed();
 	void OnSwitchCameraReleased();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnProjectile(FVector SpawnLocation, FRotator SpawnRotation);
 
 	UPROPERTY()
 	FVector InitialSpringArmLocation;
@@ -85,16 +87,22 @@ protected:
 	float RollSpeed = 3.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
-	float ReflectionConstant = 0.8f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
-	float ReflectionOffset = 300.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	float CameraDistance = 3000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	float SpringArmOffset = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	float FireInterval = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	float TotalRechargeTime = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	int MaxShootingCount = 30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
+	int CurrentShootingCount = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flight")
 	TSubclassOf<AActor> ProjectileClass;
@@ -106,16 +114,21 @@ protected:
 	float YawInput = 0.0f;
 	float RollInput = 0.0f;
 	float FlipInput = 0.0f;
+	float FireInput = 0.0f;
 
 	float CurrentPitchAngle = 0.0f;
 	float CurrentYawAngle = 0.0f;
 	float CurrentRollAngle = 0.0f;
 
+	float LastFireTime = 0.0f;
+
+	float RechargeTimer = 0.0f;
+
 	bool IsHoldingSwitchCamera = false;
+	bool IsShooting = false;
+	bool IsRecharging = false;
 
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	UFUNCTION()
-	void OnSpaceshipHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

@@ -51,15 +51,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
 	AActor* Target;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
+	TSubclassOf<APawn> SpaceshipClass;
+
 	float FireTimer = 0.0f;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Fire();
 
 	void AimAtTarget(float DeltaTime);
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };

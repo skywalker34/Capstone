@@ -20,10 +20,11 @@ AEnemyShipPawn::AEnemyShipPawn()
 	ShipMesh->SetNotifyRigidBodyCollision(true);
 
 	MovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComp"));
-	MovementComp->MaxSpeed = 1500.f;
 
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
 	Muzzle->SetupAttachment(ShipMesh);
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AEnemyShipPawn::BeginPlay()
@@ -40,6 +41,7 @@ void AEnemyShipPawn::BeginPlay()
 	{
 		CurrentWaypointIndex = 0;
 	}
+	MovementComp->MaxSpeed = ChaseSpeed;
 }
 
 void AEnemyShipPawn::Tick(float DeltaTime)
@@ -48,7 +50,6 @@ void AEnemyShipPawn::Tick(float DeltaTime)
 	if (!Target) return;
 
 	NextState();
-
 	Action(DeltaTime);
 }
 
@@ -58,48 +59,6 @@ void AEnemyShipPawn::Chase(float DeltaTime) {
 
 	FVector MyLocation = GetActorLocation();
 	FVector TargetLocation = Target->GetActorLocation();
-
-	//// ===== 新增：前方牆壁偵測 =====
-	//FVector Forward = GetActorForwardVector();
-	//FHitResult Hit;
-	//FCollisionQueryParams Params;
-	//Params.AddIgnoredActor(this);
-
-	//bool bHitWall = GetWorld()->LineTraceSingleByChannel(
-	//	Hit,
-	//	MyLocation,
-	//	MyLocation + Forward * TraceDistance,
-	//	ECC_WorldStatic,
-	//	Params
-	//);
-
-	//// ===== 新增：如果撞牆，設定避障目標 =====
-	//if (bHitWall)
-	//{
-	//	IsAvoidingWall = true;
-
-	//	FVector WallNormal = Hit.ImpactNormal;
-
-	//	// 往牆法線方向設一個目標點
-	//	AvoidTargetLocation = MyLocation + WallNormal * AvoidDistance;
-	//}
-
-	//// ===== 新增：決定現在追誰 =====
-	//if (IsAvoidingWall)
-	//{
-	//	TargetLocation = AvoidTargetLocation;
-
-	//	float DistToAvoid = FVector::Dist(MyLocation, AvoidTargetLocation);
-
-	//	if (DistToAvoid < AvoidArriveDistance)
-	//	{
-	//		IsAvoidingWall = false;
-	//	}
-	//}
-	//else
-	//{
-	//	TargetLocation = Target->GetActorLocation();
-	//}
 
 	FVector ToTarget = TargetLocation - MyLocation;
 
@@ -127,8 +86,7 @@ void AEnemyShipPawn::Chase(float DeltaTime) {
 		SpeedScale = FMath::Clamp((DistanceToTarget - DesiredDistance) / SlowDownRange, 0.f, 1.f);
 	}
 
-	FVector NewLocation = MyLocation + GetActorForwardVector() * ChaseSpeed * SpeedScale * DeltaTime;
-	SetActorLocation(NewLocation);
+	AddMovementInput(GetActorForwardVector(), SpeedScale);
 }
 
 void AEnemyShipPawn::Patrol(float DeltaTime)
@@ -178,12 +136,10 @@ void AEnemyShipPawn::Attack(float DeltaTime)
 	FVector RandomDir = FMath::VRandCone(Forward, ShootingConeAngleRad);
 	FRotator SpawnRotation = RandomDir.Rotation();
 
-	FActorSpawnParameters Params;
-	Params.Owner = this;
-
 	FireTimer += DeltaTime;
 	if (FireTimer >= FireInterval) {
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
+		//GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, Params);
+		SpawnProjectile(SpawnLocation, SpawnRotation);
 		FireTimer = 0.0f;
 	}
 }
@@ -219,7 +175,6 @@ void AEnemyShipPawn::NextState()
 	case EEnemyState::Patrol:
 		if (TargetDistance < ChaseRange)
 			CurrentState = EEnemyState::Chase;
-		CurrentSpeed = ChaseSpeed;
 		break;
 
 	case EEnemyState::Chase:
