@@ -100,13 +100,7 @@ protected:
 	float ShootingConeAngle = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
-	float TraceDistance = 8000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
-	float AvoidDistance = 10000.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
-	float AvoidArriveDistance = 2000.f;
+	bool CanSeePlayer = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyAI")
 	TSubclassOf<AActor> ProjectileClass;

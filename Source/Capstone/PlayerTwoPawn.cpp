@@ -231,13 +231,6 @@ void APlayerTwoPawn::Fire(float Value)
 
 	CurrentShootingCount++;
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,            // Unique key to prevent the same message from being added multiple times (use -1 if uniqueness doesn't matter)
-		5.0f,          // Duration the message is displayed (in seconds)
-		FColor::Red,   // Color of the text
-		FString(TEXT("FIRE 2")) // The message itself, wrapped in FString and TEXT() macros
-	);
-
 	if (CurrentShootingCount == MaxShootingCount) {
 		IsRecharging = true;
 	}

@@ -20,6 +20,7 @@ AEnemyShipPawn::AEnemyShipPawn()
 	ShipMesh->SetNotifyRigidBodyCollision(true);
 
 	MovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComp"));
+	MovementComp->UpdatedComponent = RootComponent;
 
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
 	Muzzle->SetupAttachment(ShipMesh);
@@ -55,7 +56,7 @@ void AEnemyShipPawn::Tick(float DeltaTime)
 
 
 void AEnemyShipPawn::Chase(float DeltaTime) {
-	if (!Target) return;
+	if (!Target || !CanSeePlayer) return;
 
 	FVector MyLocation = GetActorLocation();
 	FVector TargetLocation = Target->GetActorLocation();
@@ -127,10 +128,9 @@ void AEnemyShipPawn::Patrol(float DeltaTime)
 void AEnemyShipPawn::Attack(float DeltaTime)
 {
 
-	if (!ProjectileClass || !Muzzle) return;
+	if (!ProjectileClass || !Muzzle || !CanSeePlayer) return;
 
 	FVector SpawnLocation = Muzzle->GetComponentLocation();
-	//FRotator SpawnRotation = Muzzle->GetComponentRotation();
 	FVector Forward = Muzzle->GetForwardVector();
 	float ShootingConeAngleRad = FMath::DegreesToRadians(ShootingConeAngle);
 	FVector RandomDir = FMath::VRandCone(Forward, ShootingConeAngleRad);
