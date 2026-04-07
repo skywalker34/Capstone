@@ -27,11 +27,6 @@ void ATurret::BeginPlay()
 
 	if (!Target)
 	{
-		//APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		//if (PlayerPawn)
-		//{
-		//	Target = PlayerPawn;
-		//}
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), SpaceshipClass, FoundActors);
 
@@ -46,6 +41,17 @@ void ATurret::BeginPlay()
 void ATurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!Target)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), SpaceshipClass, FoundActors);
+
+		if (FoundActors.Num() > 0)
+		{
+			Target = Cast<APawn>(FoundActors[0]);
+		}
+	}
 
 	if (!Target) return;
 
